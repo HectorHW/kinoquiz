@@ -6,6 +6,8 @@ from pydantic import BaseModel
 class BaseQuestion(BaseModel):
     cost: int
     prompt: str
+    answer: str
+    answer_image: str | None = None
     time: int = 20
     done: bool = False
 

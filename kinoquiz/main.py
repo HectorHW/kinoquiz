@@ -12,6 +12,8 @@ from kinoquiz.screens import (
     ImageQuestionScreen,
     TextQuestionScreen,
     VideoQuestionScreen,
+    ImageAnswerScreen,
+    TextAnswerScreen,
 )
 
 Window.size = (1920, 1080)
@@ -40,11 +42,16 @@ class SI(App):
         video = VideoQuestionScreen(name="video_question", state=state)
         text = TextQuestionScreen(name="text_question", state=state)
 
+        image_answer = ImageAnswerScreen(name="image_answer", state=state)
+        text_answer = TextAnswerScreen(name="text_answer", state=state)
+
         sm.add_widget(grid)
 
         sm.add_widget(video)
         sm.add_widget(text)
         sm.add_widget(image)
+        sm.add_widget(image_answer)
+        sm.add_widget(text_answer)
         Window.fullscreen = "auto"
         return sm
 

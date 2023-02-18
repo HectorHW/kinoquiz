@@ -12,6 +12,23 @@ from kinoquiz.layout import center, pad, ratio_sized
 from kinoquiz.timer import ControllableTimer
 
 
+def get_question_page(question):
+    if isinstance(question, VideoQuestion):
+        return "video_question"
+    elif isinstance(question, ImageQuestion):
+        return "image_question"
+    elif isinstance(question, MusicQuestion):
+        raise NotImplementedError
+    else:
+        return "text_question"
+
+
+def get_question_answer_page(question):
+    if question.answer_image is not None:
+        return "image_answer"
+    return "text_answer"
+
+
 class GridScreen(Screen):
     def __init__(self, state: State, **kw):
         super().__init__(**kw)
@@ -55,14 +72,7 @@ class GridScreen(Screen):
         instance.set_disabled(True)
         self.state.CURRENT_QUESTION = question
 
-        if isinstance(question, VideoQuestion):
-            self.manager.current = "video_question"
-        elif isinstance(question, ImageQuestion):
-            self.manager.current = "image_question"
-        elif isinstance(question, MusicQuestion):
-            raise NotImplementedError
-        else:
-            self.manager.current = "text_question"
+        self.manager.current = get_question_page(question)
 
 
 class QuestionScreen(Screen):
@@ -72,9 +82,12 @@ class QuestionScreen(Screen):
         self.state = state
         self.timer = ControllableTimer(duration=15)
 
-        self.layout.add_widget(
-            ratio_sized(center(UIButton(text="back", callback=self.back)), x=0.2)
-        )
+        controls = BoxLayout(orientation="vertical", size_hint=(None, None), spacing=15)
+
+        controls.add_widget(UIButton(text="back", callback=self.back))
+        controls.add_widget(UIButton(text="answer", callback=self.to_answer))
+
+        self.layout.add_widget(ratio_sized(center(controls), x=0.2))
 
         q_screen = BoxLayout(orientation="vertical")
 
@@ -95,6 +108,9 @@ class QuestionScreen(Screen):
 
     def back(self, *args):
         self.manager.current = "grid"
+
+    def to_answer(self, *args):
+        self.manager.current = get_question_answer_page(self.state.CURRENT_QUESTION)
 
     def on_pre_enter(self, *args):
         self.timer.inner.duration = self.state.CURRENT_QUESTION.time  # type: ignore
@@ -152,3 +168,56 @@ class ImageQuestionScreen(QuestionScreen):
     def on_pre_enter(self, *args):
         self.image.source = self.state.CURRENT_QUESTION.image  # type: ignore
         return super().on_pre_enter(*args)
+
+
+class Answer(Screen):
+    def __init__(self, state: State, top_widget=None, **kw):
+        super().__init__(**kw)
+        self.layout = BoxLayout(orientation="horizontal")
+        self.state = state
+
+        controls = BoxLayout(orientation="vertical", size_hint=(None, None), spacing=15)
+
+        controls.add_widget(UIButton(text="back", callback=self.back))
+        controls.add_widget(UIButton(text="home", callback=self.to_home))
+
+        self.layout.add_widget(ratio_sized(center(controls), x=0.2))
+
+        q_screen = BoxLayout(orientation="vertical")
+
+        self.a_text = Label(text="question", font_size=40)
+
+        if top_widget is not None:
+            q_screen.add_widget(ratio_sized(top_widget, y=0.7))
+            q_screen.add_widget(ratio_sized(self.a_text, y=0.3))
+        else:
+            q_screen.add_widget(self.a_text)
+
+        self.layout.add_widget(ratio_sized(q_screen, x=0.8))
+
+        self.add_widget(self.layout)
+
+    def back(self, *args):
+        self.manager.current = get_question_page(self.state.CURRENT_QUESTION)
+
+    def to_home(self, *args):
+        self.manager.current = "grid"
+
+
+class ImageAnswerScreen(Answer):
+    def __init__(self, state: State, **kw):
+        self.image = Image(size=(800, 480))
+
+        super().__init__(top_widget=self.image, state=state, **kw)
+
+    def on_enter(self):
+        return super().on_enter()
+
+    def on_pre_enter(self, *args):
+        self.image.source = self.state.CURRENT_QUESTION.answer_image  # type: ignore
+        return super().on_pre_enter(*args)
+
+
+class TextAnswerScreen(Answer):
+    def __init__(self, state: State, **kw):
+        super().__init__(state=state, **kw)
