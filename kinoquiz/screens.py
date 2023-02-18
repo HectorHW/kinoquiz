@@ -1,6 +1,6 @@
 from functools import partial
 
-from entities import ImageQuestion, MusicQuestion, State, VideoQuestion
+from kinoquiz.entities import ImageQuestion, MusicQuestion, State, VideoQuestion
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.image import Image
 from kivy.uix.label import Label

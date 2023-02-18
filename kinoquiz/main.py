@@ -1,7 +1,6 @@
-from entities import (
+from kinoquiz.entities import (
     Game,
     State,
-    parse_file,
 )
 from kivy.app import App
 from kivy.core.window import Window
