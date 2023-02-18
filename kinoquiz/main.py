@@ -15,6 +15,7 @@ from kinoquiz.screens import (
     ImageAnswerScreen,
     TextAnswerScreen,
 )
+from kinoquiz.resources import get_game
 
 Window.size = (1920, 1080)
 
@@ -29,7 +30,8 @@ class GameManager(ScreenManager):
 
 class SI(App):
     def build(self):
-        game = parse_file("game.yaml")
+        game = get_game()
+        print(game)
         sm = GameManager(game=game, transition=FadeTransition())
         state = State(game=game)
 
