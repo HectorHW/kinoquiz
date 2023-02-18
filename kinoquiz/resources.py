@@ -35,7 +35,9 @@ def download_resource(url: str):
     hashcode = sha1(url.encode()).hexdigest()
     extension = url.rsplit(".", maxsplit=1)[-1]
     new_name = f"{hashcode}.{extension}"
-    urllib.request.urlretrieve(url, new_name)
+    if not os.path.exists(new_name):
+        print("downloading new ", url)
+        urllib.request.urlretrieve(url, new_name)
     return new_name
 
 
