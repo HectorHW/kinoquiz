@@ -119,7 +119,7 @@ class QuestionScreen(Screen):
 
 class VideoQuestionScreen(QuestionScreen):
     def __init__(self, state: State, **kw):
-        self.player = VideoPlayer(size=(800, 480))
+        self.player = VideoPlayer(size=(800, 480), volume=0.5)
         super().__init__(top_widget=self.player, state=state, **kw)
 
     def on_pre_enter(self, *args):
