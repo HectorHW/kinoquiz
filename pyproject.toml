@@ -1,0 +1,28 @@
+[tool.poetry]
+name = "kinoquiz"
+version = "0.1.0"
+description = ""
+authors = ["Vladimir Redkin <vsredkin01@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+pyyaml = "^6.0"
+pydantic = "^1.10.5"
+ffpyplayer = "^4.4.0"
+kivy = { url = "https://github.com/kivy/kivy/archive/master.zip", extras = [
+    "all",
+] }
+
+
+[tool.poetry.group.dev.dependencies]
+black = "^23.1.0"
+isort = "^5.12.0"
+flake8 = "^6.0.0"
+mypy = "^1.0.1"
+types-pyyaml = "^6.0.12.6"
+autoflake = "^2.0.1"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
