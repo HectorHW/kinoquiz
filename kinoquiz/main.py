@@ -1,22 +1,11 @@
 from entities import (
-    AnyQuestion,
     Game,
-    ImageQuestion,
-    MusicQuestion,
-    Section,
     State,
-    VideoQuestion,
     parse_file,
 )
 from kivy.app import App
 from kivy.core.window import Window
-from kivy.uix.anchorlayout import AnchorLayout
-from kivy.uix.boxlayout import BoxLayout
-from kivy.uix.button import Button
-from kivy.uix.image import Image
-from kivy.uix.label import Label
-from kivy.uix.screenmanager import FadeTransition, Screen, ScreenManager
-from kivy.uix.videoplayer import VideoPlayer
+from kivy.uix.screenmanager import FadeTransition, ScreenManager
 
 from kinoquiz.screens import (
     GridScreen,
@@ -24,7 +13,6 @@ from kinoquiz.screens import (
     TextQuestionScreen,
     VideoQuestionScreen,
 )
-from kinoquiz.timer import ControllableTimer
 
 Window.size = (1920, 1080)
 
