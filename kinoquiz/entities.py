@@ -41,8 +41,7 @@ class Section(BaseModel):
     categories: list[Category]
 
 
-class Game(BaseModel):
-    sections: list[Section]
+Game = list[Section]
 
 
 def parse_file(filename: str) -> Game:
@@ -53,5 +52,6 @@ def parse_file(filename: str) -> Game:
 
 
 class State(BaseModel):
-    CURRENT_SECTION: Section | None = None
+    game: Game
+    CURRENT_SECTION: int = 0
     CURRENT_QUESTION: AnyQuestion | None = None

@@ -10,6 +10,8 @@ from kivy.uix.videoplayer import VideoPlayer
 from kinoquiz.buttons import GRID_VSIZE, GridButton, GridLabel, UIButton
 from kinoquiz.layout import center, pad, ratio_sized
 from kinoquiz.timer import ControllableTimer
+from kinoquiz.entities import Section
+from kivy.uix.button import Button
 
 
 def get_question_page(question):
@@ -29,8 +31,17 @@ def get_question_answer_page(question):
     return "text_answer"
 
 
+def get_grid_name(state: State):
+    return f"grid_{state.CURRENT_SECTION}"
+
+
+def inc_section(state: State):
+    state.CURRENT_SECTION = (state.CURRENT_SECTION + 1) % len(state.game)
+    return get_grid_name(state)
+
+
 class GridScreen(Screen):
-    def __init__(self, state: State, **kw):
+    def __init__(self, state: State, section: Section, **kw):
         super().__init__(**kw)
         grid = BoxLayout(
             orientation="vertical",
@@ -40,7 +51,7 @@ class GridScreen(Screen):
         self.state = state
         grid_height = 0
         grid_width = 0
-        for category in self.state.CURRENT_SECTION.categories:  # type: ignore
+        for category in section.categories:  # type: ignore
             row = BoxLayout(
                 orientation="horizontal",
                 size_hint_x=None,
@@ -64,7 +75,18 @@ class GridScreen(Screen):
         grid.width = grid_width
         grid.minimum_width = grid_width
 
-        self.add_widget(pad(center(grid, anchor_x="left"), 80))
+        layout = BoxLayout(orientation="vertical")
+
+        next_btn = Button(
+            size=(80, 80),
+            text="=>",
+        )
+        next_btn.bind(on_press=self.click_next_grid)  # type: ignore
+
+        layout.add_widget(ratio_sized(pad(center(grid, anchor_x="left"), 80), y=0.97))
+        layout.add_widget(ratio_sized(next_btn, y=0.03))
+
+        self.add_widget(layout)
 
     def click_question(self, instance, *, question):
         question.done = True
@@ -73,6 +95,9 @@ class GridScreen(Screen):
         self.state.CURRENT_QUESTION = question
 
         self.manager.current = get_question_page(question)
+
+    def click_next_grid(self, *args):
+        self.manager.current = inc_section(self.state)
 
 
 class QuestionScreen(Screen):
@@ -107,7 +132,7 @@ class QuestionScreen(Screen):
         self.add_widget(self.layout)
 
     def back(self, *args):
-        self.manager.current = "grid"
+        self.manager.current = get_grid_name(self.state)
 
     def to_answer(self, *args):
         self.manager.current = get_question_answer_page(self.state.CURRENT_QUESTION)
@@ -201,7 +226,7 @@ class Answer(Screen):
         self.manager.current = get_question_page(self.state.CURRENT_QUESTION)
 
     def to_home(self, *args):
-        self.manager.current = "grid"
+        self.manager.current = get_grid_name(self.state)
 
 
 class ImageAnswerScreen(Answer):

@@ -21,9 +21,6 @@ Window.size = (1920, 1080)
 grid_vsize = 1080 // 6 - 3
 
 
-state = State()
-
-
 class GameManager(ScreenManager):
     def __init__(self, game: Game, **kwargs):
         super().__init__(**kwargs)
@@ -34,9 +31,12 @@ class SI(App):
     def build(self):
         game = parse_file("game.yaml")
         sm = GameManager(game=game, transition=FadeTransition())
-        state.CURRENT_SECTION = game.sections[0]
+        state = State(game=game)
 
-        grid = GridScreen(name="grid", state=state)
+        for i, section in enumerate(game):
+            sec_name = f"grid_{i}"
+            grid = GridScreen(name=sec_name, state=state, section=section)
+            sm.add_widget(grid)
 
         image = ImageQuestionScreen(name="image_question", state=state)
         video = VideoQuestionScreen(name="video_question", state=state)
@@ -44,8 +44,6 @@ class SI(App):
 
         image_answer = ImageAnswerScreen(name="image_answer", state=state)
         text_answer = TextAnswerScreen(name="text_answer", state=state)
-
-        sm.add_widget(grid)
 
         sm.add_widget(video)
         sm.add_widget(text)
