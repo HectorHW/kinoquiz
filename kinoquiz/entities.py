@@ -1,6 +1,6 @@
-from pydantic import BaseModel
-import yaml
 import pydantic
+import yaml
+from pydantic import BaseModel
 
 
 class BaseQuestion(BaseModel):
@@ -48,3 +48,8 @@ def parse_file(filename: str) -> Game:
         yml = yaml.safe_load(f)
         print(yml)
         return pydantic.parse_obj_as(Game, yml)
+
+
+class State(BaseModel):
+    CURRENT_SECTION: Section | None = None
+    CURRENT_QUESTION: AnyQuestion | None = None
