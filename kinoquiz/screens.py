@@ -12,6 +12,7 @@ from kinoquiz.layout import center, pad, ratio_sized
 from kinoquiz.timer import ControllableTimer
 from kinoquiz.entities import Section
 from kivy.uix.button import Button
+from kinoquiz.resources import get_actual_path
 
 
 def get_question_page(question):
@@ -164,7 +165,7 @@ class VideoQuestionScreen(QuestionScreen):
         super().__init__(top_widget=self.player, state=state, **kw)
 
     def on_pre_enter(self, *args):
-        self.player.source = self.state.CURRENT_QUESTION.video  # type: ignore
+        self.player.source = get_actual_path(self.state.CURRENT_QUESTION.video)  # type: ignore
         return super().on_pre_enter(*args)
 
     def on_enter(self):
@@ -191,7 +192,7 @@ class ImageQuestionScreen(QuestionScreen):
         return super().on_enter()
 
     def on_pre_enter(self, *args):
-        self.image.source = self.state.CURRENT_QUESTION.image  # type: ignore
+        self.image.source = get_actual_path(self.state.CURRENT_QUESTION.image)  # type: ignore
         return super().on_pre_enter(*args)
 
 
@@ -239,7 +240,7 @@ class ImageAnswerScreen(Answer):
         return super().on_enter()
 
     def on_pre_enter(self, *args):
-        self.image.source = self.state.CURRENT_QUESTION.answer_image  # type: ignore
+        self.image.source = get_actual_path(self.state.CURRENT_QUESTION.answer_image)  # type: ignore
         return super().on_pre_enter(*args)
 
 

@@ -35,10 +35,15 @@ def download_resource(url: str):
     hashcode = sha1(url.encode()).hexdigest()
     extension = url.rsplit(".", maxsplit=1)[-1]
     new_name = f"{hashcode}.{extension}"
-    if not os.path.exists(new_name):
+    rel_path = get_actual_path(new_name)
+    if not os.path.exists(rel_path):
         print("downloading new ", url)
-        urllib.request.urlretrieve(url, new_name)
+        urllib.request.urlretrieve(url, rel_path)
     return new_name
+
+
+def get_actual_path(path):
+    return os.path.join(get_base_dir(), path)
 
 
 def fix_question(question: AnyQuestion):
