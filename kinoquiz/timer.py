@@ -5,9 +5,13 @@ from kivy.graphics import Color, Rectangle
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.button import Button
 from kivy.uix.label import Label
+from typing import Callable
+from kivy.properties import ListProperty
 
 
 class Timer(Label):
+    color_fg = ListProperty([0.1, 0.4, 1, 0.6])
+
     def __init__(self, duration=1, update_interval: float = 1 / 30, **kwargs):
         super().__init__(**kwargs)
         self.height = 30
@@ -18,6 +22,8 @@ class Timer(Label):
         self.running = False
         self.update_interval = update_interval
         Clock.schedule_interval(lambda _: self.tick(), update_interval)
+        self.on_pause: list[Callable[[], None]] = []
+        self.on_resume: list[Callable[[], None]] = []
 
     def tick(self):
         if not self.running:
@@ -34,7 +40,7 @@ class Timer(Label):
     def update(self):
         self.canvas.clear()  # type: ignore
         with self.canvas:  # type: ignore
-            Color(0.1, 0.4, 1, 0.6)
+            Color(*self.color_fg)
             Rectangle(
                 pos=self.pos,
                 size=(self.width * self.percent_progress, self.height),
@@ -56,18 +62,28 @@ class Timer(Label):
     def restart(self):
         self.progress = self.duration
         self.running = True
+        for callback in self.on_resume:
+            callback()
         self.update()
 
     def pause(self):
         self.running = False
+        for callback in self.on_pause:
+            callback()
+        self.update()
+
+    def zero(self):
+        self.running = False
+        self.progress = 0
         self.update()
 
     def resume(self):
         self.running = True
+        for callback in self.on_resume:
+            callback()
         self.update()
 
     def trigger(self):
-        print("trigger")
         if self.running:
             self.pause()
         else:

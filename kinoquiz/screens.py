@@ -9,7 +9,7 @@ from kivy.uix.videoplayer import VideoPlayer
 
 from kinoquiz.buttons import GRID_VSIZE, GridButton, GridLabel, UIButton
 from kinoquiz.layout import center, pad, ratio_sized
-from kinoquiz.timer import ControllableTimer
+from kinoquiz.timer import ControllableTimer, Timer
 from kinoquiz.entities import Section
 from kivy.uix.button import Button
 from kinoquiz.resources import get_actual_path
@@ -106,7 +106,16 @@ class QuestionScreen(Screen):
         super().__init__(**kw)
         self.layout = BoxLayout(orientation="horizontal")
         self.state = state
+
         self.timer = ControllableTimer(duration=15)
+        self.answer_timer = Timer(duration=5)
+        self.answer_timer.color_fg = [0.1, 1, 0.4, 0.6]
+        self.timer.inner.on_pause += [lambda: self.answer_timer.restart()]
+        self.timer.inner.on_resume += [lambda: self.answer_timer.zero()]
+
+        timers = BoxLayout(orientation="vertical", size_hint=(1, 1))
+        timers.add_widget(self.answer_timer)
+        timers.add_widget(self.timer)
 
         controls = BoxLayout(orientation="vertical", size_hint=(None, None), spacing=15)
 
@@ -125,7 +134,7 @@ class QuestionScreen(Screen):
         else:
             q_screen.add_widget(self.q_text)
 
-        q_screen.add_widget(ratio_sized(self.timer, y=0.05))
+        q_screen.add_widget(ratio_sized(timers, y=0.05))
 
         # TODO timer
         self.layout.add_widget(ratio_sized(q_screen, x=0.8))
@@ -141,6 +150,8 @@ class QuestionScreen(Screen):
     def on_pre_enter(self, *args):
         self.timer.inner.duration = self.state.CURRENT_QUESTION.time  # type: ignore
         self.timer.inner.reset()
+        self.answer_timer.duration = self.state.CURRENT_QUESTION.answer_time  # type: ignore
+        self.answer_timer.zero()
         self.q_text.text = self.state.CURRENT_QUESTION.prompt  # type: ignore
 
     def on_enter(self):
@@ -163,6 +174,15 @@ class VideoQuestionScreen(QuestionScreen):
     def __init__(self, state: State, **kw):
         self.player = VideoPlayer(size=(800, 480), volume=0.5)
         super().__init__(top_widget=self.player, state=state, **kw)
+
+        def pause_player():
+            self.player.state = "pause"
+
+        def resume_player():
+            self.player.state = "play"
+
+        self.timer.inner.on_pause += [pause_player]
+        self.timer.inner.on_resume += [resume_player]
 
     def on_pre_enter(self, *args):
         self.player.source = get_actual_path(self.state.CURRENT_QUESTION.video)  # type: ignore
