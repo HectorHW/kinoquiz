@@ -9,7 +9,7 @@ class BaseQuestion(BaseModel, extra="forbid"):
     answer: str
     answer_image: str | None = None
     time: int = 20
-    answer_time: int = 5
+    answer_time: int = 12
     done: bool = False
 
 

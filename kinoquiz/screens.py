@@ -107,8 +107,8 @@ class QuestionScreen(Screen):
         self.layout = BoxLayout(orientation="horizontal")
         self.state = state
 
-        self.timer = ControllableTimer(duration=15)
-        self.answer_timer = Timer(duration=5)
+        self.timer = ControllableTimer(duration=20)
+        self.answer_timer = Timer(duration=12)
         self.answer_timer.color_fg = [0.1, 1, 0.4, 0.6]
         self.timer.inner.on_pause += [lambda: self.answer_timer.restart()]
         self.timer.inner.on_resume += [lambda: self.answer_timer.zero()]
